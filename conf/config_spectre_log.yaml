@@ -1,0 +1,245 @@
+missing_dc_path:
+  convert: int
+  match: Only one connection to the following
+  message:
+    location: simulation.warnings
+  position: -2
+  type: exact_match
+reltol:
+  convert: float
+  examples:
+    - "    reltol = 1e-03": 0.001
+  match: "reltol = "
+  message:
+    location: simulation.settings
+  position: -1
+  type: exact_match
+vabstol:
+  convert: float
+  examples:
+    - "            vabstol = 1e-06": 1.0e-06
+  match: "vabstol = "
+  message:
+    location: simulation.settings
+  position: -1
+  type: exact_match
+iabstol:
+  active: false
+  convert: float
+  examples:
+    - "            iabstol = 1e-12": 1.0e-12
+  match: "iabstol = "
+  message:
+    location: simulation.settings
+  position: -1
+  type: exact_match
+issues:
+  active: true
+  examples:
+    - "WARNING (SPECTRE-4056): foo bar.":
+        code: SPECTRE-4056
+        description: foo bar.
+  message:
+    location: simulation
+  template: |
+    <group name="errors*">
+        FATAL ({{code}}): {{description | ORPHRASE }}
+    </group>
+    <group name="warnings*">
+        WARNING ({{code}}): {{description | ORPHRASE }}
+    </group>
+    <group name="errors*">
+        ERROR ({{code}}): {{description | ORPHRASE }}
+    </group>
+    <group name="supressed*">
+     {{count}} {{type}} suppressed.
+    </group>
+    <group name="summary*">
+    spectre completes with {{num_errors | to_int }} errors, {{num_warnings | to_int }} warnings, and {{num_notices | to_int }} notices.
+    </group>
+    <group name="summary*">
+    spectre completes with {{num_errors | to_int }} error, {{num_warnings | to_int }} warnings, and {{num_notices | to_int }} notices.
+    </group>
+  type: ttp
+simulation:
+  type: ttp
+  message:
+    location: simulation
+  example: |
+    CPU Type: Intel(R) Xeon(R) CPU E5-2690 v3 @ 2.60GHz
+  problematic: |
+    Time for {{task_name | ORPHRASE}}: CPU = {{cpu_amount | to_float}} {{cpu_units}} ({{human_cpu_str | re(".*")}}), elapsed = {{elapsed}} {{elapsed_unit}} ({{human_elapsed_str | re(".*")}}).
+  template: |
+    <group name="waiting_time_licenses">
+        License for Spectre was obtained after waiting {{amount | to_int}} {{amount_unit}}.
+    </group>
+    <group name="time_spent_x*">
+    Time for {{task_name | ORPHRASE}}: CPU = {{cpu_amount | to_float}} {{cpu_units}} ({{human_cpu_str | ORPHRASE}}), elapsed = {{elapsed}} {{elapsed_unit}} ({{human_elapsed_str | ORPHRASE}}).
+    </group>
+    <group name="time_spent_cpu*">
+    Time used: CPU = {{cpu_time | to_float}} {{cpu_time_unit}} ({{cput_time_str | PHRASE}}), elapsed = {{elapsed}} {{elapsed_unit}} ({{elapsed_str | PHRASE}}), util. = {{utilization_pct}}.
+    </group>
+    <group name="time_spent*">
+    Simulation started at: {{start | ORPHRASE }} ended at: {{end | ORPHRASE}}, with elapsed time (wall clock): {{amount}} {{amount_unit}} ({{elapsed_str | re(".*")}}).
+    </group>
+    <group name="Spectre*" >
+    Version {{version}} {{bit | to_int}}bit -- {{day | to_int}} {{month}} {{year | to_int}}
+    Affinity is set by user to processors: {{affinity | ORPHRASE | split(" ") }}
+    </group>
+    <macro>
+    def split_to_list(data):
+        words_list = [int(x) for x in data.split(" ") if len(x)>0]
+        return words_list
+    </macro>
+    <group name="Memory*">
+    Peak memory used = {{amount | to_float}} {{amount_unit}}.
+    </group>
+    <group name="CPU*">
+    CPU Type: {{cpu_type_info | PHRASE}}
+    </group>
+  units: 
+    time: "s"
+    byte: "MB"
+analysis_control_inventory:
+  active: true
+  example: |
+    'Analysis and control statement inventory:'
+    ' hb 1     '
+    'info 4     '
+    'montecarlo 1     '
+  message:
+    location: simulation
+  template: |
+    <group>
+    Analysis and control statement inventory:{{ _start_ }}
+    <group>
+    {{ name | re("(\s+)(\w+)") | replaceall(" " "")}} {{count | DIGIT | to_int}}
+    </group>
+    {{ _end_ }}
+    </group>
+  type: ttp
+global_user_options:
+  active: true
+  message:
+    location: simulation
+  template: |
+    <group>
+    Global user options:{{ _start_ }}
+    <group>
+    {{ name | re("(\s+)(\w+)") | replaceall(" " "")}} = {{value}}
+    </group>
+    {{ _end_ }}
+    </group>
+  type: ttp
+initial_setup:
+  active: true
+  example: |
+    Multithreading is disabled due to the size of the design being too small.
+  message:
+    location: simulation
+  template: |
+    <group>
+    Notice from spectre during initial setup.{{ _start_ }}
+    <group>
+        {{notice | ORPHRASE}}.
+    </group>
+    {{ _end_ }}
+    </group>
+  type: ttp
+aggregate_audit:
+  type: ttp
+  message:
+    location: simulation
+  template: |
+    <group>
+    Aggregate audit {{date_str | PHRASE}}:{{ _start_ }}
+    <group>
+    Peak memory used = {{amount | to_float}} {{amount_unit}}.
+    </group>
+    {{ _end_ }}
+    </group>
+  units: 
+    time: "s"
+    byte: "MB"
+circuit_inventory:
+  message:
+    location: simulation
+  template: |
+    <group>
+    Circuit inventory:{{ _start_ }}
+    <group>
+    {{ element | re("(\s*)(\w+)") | replaceall(" " "")}} {{count | DIGIT | to_int}}
+    </group>
+    {{ _end_ }}
+    </group>
+  type: ttp
+design_checks_inventory:
+  message:
+    location: simulation
+  template: |
+    <group>
+    Design checks inventory:{{ _start_ }}
+    <group>
+    {{ name | re("(\s*)(\w+)") | replaceall(" " "")}} {{count | DIGIT | to_int}}
+    </group>
+    {{ _end_ }}
+    </group>
+  type: ttp
+output_statements:
+  message:
+    location: simulation
+  template: |
+    <group>
+    Output statements:{{ _start_ }}
+    <group>
+    {{ name | re("(\s*)(\.*\w+)") | replaceall(" ") | replaceall(".")}} {{count | DIGIT | to_int}}
+    </group>
+    {{ _end_ }}
+    </group>
+  type: ttp
+tran:
+  examples:
+    - "Transient Analysis `tran': time = (0 s -> 100 ms)"
+    - Number of accepted tran steps =             37768
+    - "Total time required for tran analysis `tran': CPU = 7.57 ms, elapsed = 24.8971
+      ms."
+    - "Total time required for tran analysis `tran': CPU = 428.358 s (7m  8.4s), elapsed
+      = 438.51 s (7m  18.5s)."
+  message:
+    location: simulation.analyses
+  template: |
+    <group name="simulationTime">
+    Transient Analysis `{{name}}': time = ({{start_time}} {{start_time_unit}} -> {{end_time}} {{end_time_unit}})
+    Number of accepted tran steps = {{timesteps | to_int}}
+    </group>
+    <group name="runtime">
+    <group>
+    Total time required for tran analysis `{{tran_name}}': CPU = {{cpu_time | to_float}} {{cpu_time_unit}}, elapsed = {{elapsed_time | to_float}} {{elapsed_time_unit}}.
+    </group>
+    <group>
+    Total time required for tran analysis `{{tran_name}}': CPU = {{cpu_time | to_float}} {{cpu_time_unit}} ({{cpu_time_alternative | re(".*")}}), elapsed = {{elapsed_time | to_float}} {{elapsed_time_unit}} ({{elapsed_time_alternative | re(".*")}}).
+    </group>
+    </group>
+  type: ttp
+  units: 
+    time: "s"
+    byte: "MB"
+
+dc:
+  foo: |
+    <group name="hb*">
+    Harmonic Balance Steady State Analysis `hb'': {{other | PHRASE}}:{{ _start_ }}
+    </group>
+  message:
+    location: simulation.analyses
+  template: |
+    <group name="convergence">
+    Convergence achieved in {{iterations}} iterations.
+    </group>
+    <group name="runtime">
+    DC simulation time: CPU = {{dc_cpu | to_float}} {{dc_cpu_unit}}, elapsed = {{dc_elapsed | to_float}} {{dc_elapsed_unit}}.
+    </group>
+  type: ttp
+  units: 
+    time: "s"
+    byte: "MB"

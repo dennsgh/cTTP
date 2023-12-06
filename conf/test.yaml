@@ -1,0 +1,11 @@
+test:
+  type: ttp
+  message:
+    location: some_location
+  template: |
+    My name is {{ person.name }}.
+    I have a {{ person.pet.type }} named {{ person.pet.name }}.
+    He is {{ person.pet.age }} years old.
+  units:
+    time: s
+    byte: MB

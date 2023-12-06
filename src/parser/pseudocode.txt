@@ -1,0 +1,12 @@
+function parseTemplate(template_string):
+    if we find a "<group>" tag:
+        create a new Group object
+        while not "</group>" tag:
+            parse the internal template into a new Template object
+            add this Template object to the current Group's templates
+        end while
+        add the Group to the current Template's groups
+    else:
+        parse normally as you do for Fields
+    end if
+end function
